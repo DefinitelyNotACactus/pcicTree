@@ -11,6 +11,7 @@
 #include <stack>
 #include <vector>
 #include <set>
+#include <string>
 
 #include "Instance.hpp"
 #include "Util.hpp"
@@ -19,9 +20,10 @@
 
 struct Candidate {
     int intersectionSize;
+    std::string intersectionStr;
     int i, j;
     
-    Candidate(int i, int j, int intersectionSize) : i(i), j(j), intersectionSize(intersectionSize) { }
+    Candidate(int i, int j, int intersectionSize, std::string intersectionStr) : i(i), j(j), intersectionSize(intersectionSize), intersectionStr(intersectionStr) { }
     
     bool operator >(const Candidate &b) const {
         return intersectionSize > b.intersectionSize;
@@ -32,19 +34,21 @@ class PairSolution {
 private:
     Instance &instance;
     
+    std::unordered_map<std::string, bool> intersections;
     std::vector<Candidate> candidates;
     std::stack<Candidate *> bestSolution;
     int bestObj, nClusters, ticks;
     int **theoreticalObj;
+    const bool restrictIntersection;
     
     void computeTheoreticalObj();
     void createCandidates(std::set<int> participants = {});
     void solveRoot();
-    void solveNode(std::vector<bool> &, std::stack<Candidate *> &, const int, const int, int);
+    int solveNode(std::vector<bool> &, std::stack<Candidate *> &, const int, const int, int);
     
 public:
-    PairSolution(Instance &);
-    PairSolution(Instance &, std::set<int>);
+    PairSolution(Instance &, bool);
+    PairSolution(Instance &, std::set<int>, bool);
     
     std::vector<Cluster *> getSolution();
     inline int getObj() { return bestObj; }

@@ -9,13 +9,13 @@
 
 #include "PairSolution.hpp"
 
-PairSolution::PairSolution(Instance &instance) : nClusters(ceil((double) instance.N / 2)), instance(instance), bestObj(0), theoreticalObj(new int*[nClusters]) {
+PairSolution::PairSolution(Instance &instance, bool restrictIntersection) : restrictIntersection(restrictIntersection), nClusters(ceil((double) instance.N / 2)), instance(instance), bestObj(0), theoreticalObj(new int*[nClusters]) {
     createCandidates();
     computeTheoreticalObj();
     solveRoot();
 }
 
-PairSolution::PairSolution(Instance &instance, std::set<int> participants) : nClusters(ceil((double) participants.size() / 2)), instance(instance), bestObj(0), theoreticalObj(new int*[nClusters]) {
+PairSolution::PairSolution(Instance &instance, std::set<int> participants, bool restrictIntersection) : restrictIntersection(restrictIntersection), nClusters(ceil((double) participants.size() / 2)), instance(instance), bestObj(0), theoreticalObj(new int*[nClusters]) {
     if(nClusters > 0) {
         createCandidates(participants);
         computeTheoreticalObj();
@@ -23,7 +23,7 @@ PairSolution::PairSolution(Instance &instance, std::set<int> participants) : nCl
     }
 }
 
-// Obter os clusters candidatos da cobertura
+// Obter os clusters candidatos da partição
 void PairSolution::createCandidates(std::set<int> participants) {
     // Listar todos os cluster mínimos (candidatos)
     for(int i = 0; i < instance.N; i++) {
@@ -31,8 +31,10 @@ void PairSolution::createCandidates(std::set<int> participants) {
         for(int j = i + 1; j < instance.N; j++) {
             if(!participants.empty() && participants.find(j) == participants.end()) continue;
             std::set<int> intersection = getIntersection(instance, i, j);
+            std::string intersectionStr = intersectionString(intersection);
             if(intersection.size() > 0) {
-                candidates.push_back(Candidate(i, j, (int) intersection.size()));
+                candidates.push_back(Candidate(i, j, (int) intersection.size(), intersectionStr));
+                intersections[intersectionStr] = false;
             }
         }
     }
@@ -77,40 +79,54 @@ void PairSolution::solveRoot() {
         std::stack<Candidate *> currentSolution;
         std::vector<bool> inPartition(instance.N, false);
         std::cout << "(" << i << "/" << candidates.size() << ") Best solution: " << bestObj << " Theoretical best: " << theoreticalObj[0][i] << "\n";
+        std::vector<std::string> intersections;
         if(theoreticalObj[0][i] > bestObj) {
             ticks = 0;
 //        if(candidates[i].intersectionSize * nClusters > bestObj) {
             currentSolution.push(&candidates[i]);
             inPartition[candidates[i].i] = true;
             inPartition[candidates[i].j] = true;
+            intersections.push_back(candidates[i].intersectionStr);
             if(candidates[i].intersectionSize > bestObj) {
                 bestSolution = currentSolution;
                 bestObj = candidates[i].intersectionSize;
                 std::cout << "New best solution: " << bestObj << "\n";
             }
-            solveNode(inPartition, currentSolution, i, candidates[i].intersectionSize, 1);
+            int status = solveNode(inPartition, currentSolution, i, candidates[i].intersectionSize, 1);
+            switch (status) {
+                case -1:
+                    std::cout << "Maximum operations without improvement reached\n";
+                    break;
+                case 0:
+                    std::cout << "No improvement possible\n";
+                    break;
+                case 1:
+                    std::cout << "Completed subtree " << i << "\n";
+                    break;
+            }
         } else {
             break;
         }
     }
 }
 
-void PairSolution::solveNode(std::vector<bool> &inPartition, std::stack<Candidate *> &currentSolution, const int currentIndex, const int currentObj, int depth) {
+int PairSolution::solveNode(std::vector<bool> &inPartition, std::stack<Candidate *> &currentSolution, const int currentIndex, const int currentObj, int depth) {
     if(ticks > MAX_TICKS) {
 //        std::cout << "Maximum operations without improvement reached\n";
-        return;
+        return -1;
     }
     for(int i = currentIndex + 1; i < candidates.size(); i++) {
         if(currentObj + theoreticalObj[currentSolution.size()][i] <= bestObj) {
 //        if(currentObj + candidates[i].intersectionSize * (nClusters - (int) currentSolution.size()) <= bestObj) {
-            return;
+            return 0;
         }
 //        std::cout << "(" << i << "/" << candidates.size() << ") D: " << depth << " UB: " << bestObj << " LB: " << currentObj + theoreticalObj[0][i] << "\n";
         if(!inPartition[candidates[i].i] && !inPartition[candidates[i].j]) {
+            if(restrictIntersection && intersections[candidates[i].intersectionStr]) continue;
             currentSolution.push(&candidates[i]);
             inPartition[candidates[i].i] = true;
             inPartition[candidates[i].j] = true;
-            
+            intersections[candidates[i].intersectionStr] = true;
             if(currentSolution.size() < nClusters) {
                 ticks++;
                 solveNode(inPartition, currentSolution, i, currentObj + candidates[i].intersectionSize, depth++);
@@ -122,10 +138,12 @@ void PairSolution::solveNode(std::vector<bool> &inPartition, std::stack<Candidat
                 std::cout << "New best solution: " << bestObj << "\n";
             }
             currentSolution.pop();
+            intersections[candidates[i].intersectionStr] = false;
             inPartition[candidates[i].i] = false;
             inPartition[candidates[i].j] = false;
         }
     }
+    return 1;
 }
 
 std::vector<Cluster *> PairSolution::getSolution() {
@@ -182,7 +200,7 @@ std::vector<Cluster *> pairSolve(Instance &instance) {
         for(int j = i + 1; j < instance.N; j++) {
             std::set<int> intersection = getIntersection(instance, i, j);
             if(intersection.size() > 0) {
-                candidates.push_back(Candidate(i, j, (int) intersection.size()));
+                candidates.push_back(Candidate(i, j, (int) intersection.size(), intersectionString(intersection)));
             }
         }
     }
@@ -203,8 +221,4 @@ std::vector<Cluster *> pairSolve(Instance &instance) {
         }
     }
     return clusters;
-}
-
-void bestCandidate(std::vector<Candidate> &candidates, int index, int solutionValue) {
-    
 }

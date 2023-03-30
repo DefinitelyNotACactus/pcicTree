@@ -28,7 +28,5 @@ TreeNode * buildNode(Instance &, TreeNode *, std::set<int> &, const int, std::ve
 
 bool isSubIntersection(const std::vector<std::set<int> *> &, const std::set<int> &);
 bool isSameIntersection(const std::set<int> &, const std::set<int> &);
-//bool isInIntersections(const std::vector<std::set<int> *> &, const std::set<int> &);
-bool isInIntersections(const std::unordered_map<std::string, std::set<int> *> &, const std::string &);
 
 #endif /* TreeSolution_hpp */

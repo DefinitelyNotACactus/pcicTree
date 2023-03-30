@@ -36,24 +36,6 @@ bool isSameIntersection(const std::set<int> &intersectionA, const std::set<int> 
     return true;
 }
 
-bool isInIntersections(const std::unordered_map<std::string, std::set<int> *> &intersections, const std::string &candidate) {
-    return (intersections.find(candidate) != intersections.end());
-//    bool isIn;
-//    for(auto intersection : intersections) {
-//        if(intersection->size() == candidate.size()) {
-//            isIn = true;
-//            for(int element : candidate) {
-//                if(intersection->find(element) == intersection->end()) {
-//                    isIn = false;
-//                    break;
-//                }
-//            }
-//            if(isIn) return true;
-//        }
-//    }
-//    return false;
-}
-
 std::vector<TreeNode *> treeSolve(Instance &g) {
     std::vector<std::set<int> *> intersections;
     std::unordered_map<std::string, std::set<int> *> clusterIntersection; // Vetor para indicar quais intersecções estão presentes na árvore
@@ -147,11 +129,7 @@ TreeNode * buildNode(Instance &g, TreeNode *parent, std::set<int> &intersection,
     node->intersectionLeaf = true;
     for(int i = vertex + 1; i < g.N; i++) {
         std::set<int> childIntersection = getIntersection(g, node->cluster, node->intersection, i); // Pegar a intersecção do cluster
-        std::string hashIntersection = "";
-        for(int l : childIntersection) {
-            hashIntersection += std::to_string(l);
-            hashIntersection += "x";
-        }
+        std::string hashIntersection = intersectionString(childIntersection);
         // Apenas criar um filho se a intersecção do par não é vazia e não é uma subintersecção de outro par
         if(!childIntersection.empty() && !isInIntersections(clusterIntersection, hashIntersection)) {
             // Checar se o filho possui a mesma intersecção, em caso positivo, significa que o nó não é uma folha de intersecção
@@ -179,11 +157,8 @@ TreeNode * buildNode(Instance &g, TreeNode *parent, std::set<int> &intersection,
 //            std::cout << " " << l << " ";
 //        }
 //        std::cout << "} Number of clusters: " << clusters.size() + 1 << "\n";
-        std::string hashIntersection = "";
-        for(int l : node->intersection) {
-            hashIntersection += std::to_string(l);
-            hashIntersection += "x";
-        }
+        std::string hashIntersection = intersectionString(node->intersection);
+
         clusters.push_back(node);
         clusterIntersection.insert({hashIntersection, &node->intersection});
 //        clusterIntersection.push_back(&node->intersection);
