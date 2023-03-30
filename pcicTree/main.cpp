@@ -89,7 +89,7 @@ void printPartition(std::ostream &os, std::vector<Cluster *> &clusters, bool ign
                 aux++;
             }
         }
-        if(i < nClusters - 1) {
+        if(i < nClusters) {
             os << ",\n";
         }
         delete cluster;
