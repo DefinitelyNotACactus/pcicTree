@@ -128,6 +128,9 @@ TreeNode * buildNode(Instance &g, TreeNode *parent, std::set<int> &intersection,
     // Criar os filhos do nó
     node->intersectionLeaf = true;
     for(int i = vertex + 1; i < g.N; i++) {
+        if(node->childs.size() > 0 && node->intersection.size() == 1) { // Se o nó possui filhos e sua interseção contém apenas um recurso, ele não tem como criar novos filhos, logo pode sair do laço
+            break;
+        }
         std::set<int> childIntersection = getIntersection(g, node->cluster, node->intersection, i); // Pegar a intersecção do cluster
         std::string hashIntersection = intersectionString(childIntersection);
         // Apenas criar um filho se a intersecção do par não é vazia e não é uma subintersecção de outro par
