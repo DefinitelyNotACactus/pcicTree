@@ -16,7 +16,7 @@
 #include "Instance.hpp"
 
 struct Cluster {
-    std::vector<int> cluster;
+    std::vector<int> elements;
     std::set<int> intersection;
 };
 

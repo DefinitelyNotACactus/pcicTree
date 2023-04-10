@@ -13,12 +13,13 @@
 
 #include "TreeSolution.hpp"
 #include "PairSolution.hpp"
+#include "Metrics.hpp"
 
 void printCluster(std::ostream &os, TreeNode * cluster, int nClusters, int &i, int &aux) {
     os << "\t\t{\n\t\t\t\"id\": " << i++ << ", \n\t\t\t\"Elements\": [";
     aux = 0;
-    for(int element : cluster->cluster) {
-        if(aux < cluster->cluster.size() - 1) {
+    for(int element : cluster->elements) {
+        if(aux < cluster->elements.size() - 1) {
             os << element << ", ";
         } else {
             os << element << "], \n";
@@ -53,7 +54,7 @@ double printClusters(std::ostream &os, std::vector<TreeNode *> &clusters) {
     for(TreeNode * cluster : clusters) {
         obj += cluster->intersection.size();
         printCluster(os, cluster, (int) clusters.size(), i, aux);
-        delete cluster;
+//        delete cluster;
     }
     os << "]\n}\n";
     
@@ -67,8 +68,8 @@ void printPartition(std::ostream &os, std::vector<Cluster *> &clusters, bool ign
         if(ignoreEmptyIntersection && cluster->intersection.empty()) continue;
         os << "\t\t{\n\t\t\t\"id\": " << i++ << ", \n\t\t\t\"Elements\": [";
         aux = 0;
-        for(int element : cluster->cluster) {
-            if(aux < cluster->cluster.size() - 1) {
+        for(int element : cluster->elements) {
+            if(aux < cluster->elements.size() - 1) {
                 os << element << ", ";
             } else {
                 os << element << "], \n";
@@ -92,7 +93,7 @@ void printPartition(std::ostream &os, std::vector<Cluster *> &clusters, bool ign
         if(i < nClusters) {
             os << ",\n";
         }
-        delete cluster;
+//        delete cluster;
     }
     os << "]\n}\n";
 }
@@ -141,12 +142,14 @@ int main(int argc, char ** argv) {
             std::vector<Cluster *> partition = solver.getSolution();
             obj = solver.getObj();
             printPartition(argc >= 4 ? output : std::cout, partition);
+            std::cout << "Silhouette: " << averageSilhouetteIntersectionIndex(instance, partition) << "\n";
             break;
         } case 11: { // Partição com restrições de mesma interseção
             PairSolution solver(instance, true);
             std::vector<Cluster *> partition = solver.getSolution();
             obj = solver.getObj();
             printPartition(argc >= 4 ? output : std::cout, partition);
+            std::cout << "Silhouette: " << averageSilhouetteIntersectionIndex(instance, partition) << "\n";
             break;
         } case 2: { // Partição por licitação
             obj = 0;

@@ -8,6 +8,13 @@
 #ifndef Metrics_hpp
 #define Metrics_hpp
 
-#include <stdio.h>
+#include "Instance.hpp"
+#include "Metrics.hpp"
+#include "Util.hpp"
+
+#include <set>
+
+double distanceFunction(const Instance &, int , const std::set<int> &);
+double averageSilhouetteIntersectionIndex(const Instance &, const std::vector<Cluster *> &);
 
 #endif /* Metrics_hpp */

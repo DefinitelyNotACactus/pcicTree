@@ -157,8 +157,8 @@ std::vector<Cluster *> PairSolution::getSolution() {
         inPartition[top->j] = true;
         
         Cluster *cluster = new Cluster();
-        cluster->cluster.push_back(top->i);
-        cluster->cluster.push_back(top->j);
+        cluster->elements.push_back(top->i);
+        cluster->elements.push_back(top->j);
         cluster->intersection = getIntersection(instance, top->i, top->j);
         
         solution.push_back(cluster);
@@ -172,18 +172,18 @@ std::vector<Cluster *> PairSolution::getSolution() {
             // Procurar adicionar a sobra a um cluster já existente
             for(Cluster * cluster : solution) {
                 // Caso a adição não resulte em uma mudança na interseção, adicione o elemento ao cluster
-                if(getIntersection(instance, cluster->cluster, cluster->intersection, i).size() == cluster->intersection.size()) {
-                    cluster->cluster.push_back(i);
+                if(getIntersection(instance, cluster->elements, cluster->intersection, i).size() == cluster->intersection.size()) {
+                    cluster->elements.push_back(i);
                     inserted = true;
                     break;
                 }
             }
             if(!inserted) {
-                leftover->cluster.push_back(i);
+                leftover->elements.push_back(i);
             }
         }
     }
-    if(!leftover->cluster.empty()) {
+    if(!leftover->elements.empty()) {
         solution.push_back(leftover);
     } else {
         delete leftover;

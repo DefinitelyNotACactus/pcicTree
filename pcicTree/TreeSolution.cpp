@@ -46,7 +46,7 @@ std::vector<TreeNode *> treeSolve(Instance &g) {
         std::cout << "Creating root: " << i << " / " << g.N << "\n";
         TreeNode root;
         root.index = i;
-        root.cluster.push_back(i);
+        root.elements.push_back(i);
         // Criar os filhos da raiz
         for(int j = i + 1; j < g.N; j++) {
             std::set<int> intersection = getIntersection(g, i, j); // Pegar a intersecção do par (i, j)
@@ -74,8 +74,8 @@ std::vector<TreeNode *> treeSolve(Instance &g) {
         std::cout << "Computing metrics of cluster: " << ++c << " / " << clusterNodes.size() << "\n";
         // Calcular a probabilidade independente
         node->independentProb = 0;
-        for(int i = 0; i < node->cluster.size() - 1; i++) {
-            node->independentProb += log(g.vertices[node->cluster[i]].size() / (double) g.L);
+        for(int i = 0; i < node->elements.size() - 1; i++) {
+            node->independentProb += log(g.vertices[node->elements[i]].size() / (double) g.L);
 //            probI = g.vertices[node->cluster[i]].size() / (double) g.L;
 //            probI = log(g.vertices[node->cluster[i]].size() / (double) g.L);
 //            for(int j = i + 1; j < node->cluster.size(); j++) {
@@ -104,10 +104,10 @@ std::vector<TreeNode *> treeSolve(Instance &g) {
         // Calcular o clique do cluster
         node->clique = 0;
         int nPairs = 0;
-        for(int i = 0; i < node->cluster.size() - 1; i++) {
-            for(int j = i + 1; j < node->cluster.size(); j++) {
+        for(int i = 0; i < node->elements.size() - 1; i++) {
+            for(int j = i + 1; j < node->elements.size(); j++) {
                 nPairs += 1;
-                node->clique += getIntersection(g, node->cluster[i], node->cluster[j]).size() / (double) getUnion(g, node->cluster[i], node->cluster[j]).size();
+                node->clique += getIntersection(g, node->elements[i], node->elements[j]).size() / (double) getUnion(g, node->elements[i], node->elements[j]).size();
             }
         }
         node->normClique = node->clique / (double) nPairs;
@@ -122,8 +122,8 @@ TreeNode * buildNode(Instance &g, TreeNode *parent, std::set<int> &intersection,
     
     node->index = vertex;
     node->intersection = intersection;
-    node->cluster = parent->cluster;
-    node->cluster.push_back(vertex);
+    node->elements = parent->elements;
+    node->elements.push_back(vertex);
     
     // Criar os filhos do nó
     node->intersectionLeaf = true;
@@ -131,7 +131,7 @@ TreeNode * buildNode(Instance &g, TreeNode *parent, std::set<int> &intersection,
         if(node->childs.size() > 0 && node->intersection.size() == 1) { // Se o nó possui filhos e sua interseção contém apenas um recurso, ele não tem como criar novos filhos, logo pode sair do laço
             break;
         }
-        std::set<int> childIntersection = getIntersection(g, node->cluster, node->intersection, i); // Pegar a intersecção do cluster
+        std::set<int> childIntersection = getIntersection(g, node->elements, node->intersection, i); // Pegar a intersecção do cluster
         std::string hashIntersection = intersectionString(childIntersection);
         // Apenas criar um filho se a intersecção do par não é vazia e não é uma subintersecção de outro par
         if(!childIntersection.empty() && !isInIntersections(clusterIntersection, hashIntersection)) {
