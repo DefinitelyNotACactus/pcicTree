@@ -16,5 +16,7 @@
 
 double distanceFunction(const Instance &, int , const std::set<int> &);
 double averageSilhouetteIntersectionIndex(const Instance &, const std::vector<Cluster *> &);
+double categoricalUtility(const Instance &, const std::vector<Cluster *> &);
+double entropy(const Instance &, const std::vector<Cluster *> &);
 
 #endif /* Metrics_hpp */

@@ -143,6 +143,8 @@ int main(int argc, char ** argv) {
             obj = solver.getObj();
             printPartition(argc >= 4 ? output : std::cout, partition);
             std::cout << "Silhouette: " << averageSilhouetteIntersectionIndex(instance, partition) << "\n";
+            std::cout << "Categorical Utility: " << categoricalUtility(instance, partition) << "\n";
+            std::cout << "Entropy: " << entropy(instance, partition) << "\n";
             break;
         } case 11: { // Partição com restrições de mesma interseção
             PairSolution solver(instance, true);
@@ -150,6 +152,8 @@ int main(int argc, char ** argv) {
             obj = solver.getObj();
             printPartition(argc >= 4 ? output : std::cout, partition);
             std::cout << "Silhouette: " << averageSilhouetteIntersectionIndex(instance, partition) << "\n";
+            std::cout << "Categorical Utility: " << categoricalUtility(instance, partition) << "\n";
+            std::cout << "Entropy: " << entropy(instance, partition) << "\n";
             break;
         } case 2: { // Partição por licitação
             obj = 0;
