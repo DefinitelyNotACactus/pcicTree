@@ -78,7 +78,7 @@ void PairSolution::solveRoot() {
     for(int i = 0;  i < candidates.size(); i++) {
         std::stack<Candidate *> currentSolution;
         std::vector<bool> inPartition(instance.N, false);
-        std::cout << "(" << i << "/" << candidates.size() << ") Best solution: " << bestObj << " Theoretical best: " << theoreticalObj[0][i] << "\n";
+//        std::cout << "(" << i << "/" << candidates.size() << ") Best solution: " << bestObj << " Theoretical best: " << theoreticalObj[0][i] << "\n";
         std::vector<std::string> intersections;
         if(theoreticalObj[0][i] > bestObj) {
             ticks = 0;
@@ -90,20 +90,20 @@ void PairSolution::solveRoot() {
             if(candidates[i].intersectionSize > bestObj) {
                 bestSolution = currentSolution;
                 bestObj = candidates[i].intersectionSize;
-                std::cout << "New best solution: " << bestObj << "\n";
+//                std::cout << "New best solution: " << bestObj << "\n";
             }
             int status = solveNode(inPartition, currentSolution, i, candidates[i].intersectionSize, 1);
-            switch (status) {
-                case -1:
-                    std::cout << "Maximum operations without improvement reached\n";
-                    break;
-                case 0:
-                    std::cout << "No improvement possible\n";
-                    break;
-                case 1:
-                    std::cout << "Completed subtree " << i << "\n";
-                    break;
-            }
+//            switch (status) {
+//                case -1:
+//                    std::cout << "Maximum operations without improvement reached\n";
+//                    break;
+//                case 0:
+//                    std::cout << "No improvement possible\n";
+//                    break;
+//                case 1:
+//                    std::cout << "Completed subtree " << i << "\n";
+//                    break;
+//            }
         } else {
             break;
         }
@@ -135,7 +135,7 @@ int PairSolution::solveNode(std::vector<bool> &inPartition, std::stack<Candidate
                 ticks = 0;
                 bestSolution = currentSolution;
                 bestObj = currentObj + candidates[i].intersectionSize;
-                std::cout << "New best solution: " << bestObj << "\n";
+//                std::cout << "New best solution: " << bestObj << "\n";
             }
             currentSolution.pop();
             intersections[candidates[i].intersectionStr] = false;

@@ -14,9 +14,12 @@
 
 #include <set>
 
-double distanceFunction(const Instance &, int , const std::set<int> &);
+double distanceFunction(const Instance &, const int, const std::set<int> &);
+double distanceFunctionJaccard(Instance &, const int, const int);
 double averageSilhouetteIntersectionIndex(const Instance &, const std::vector<Cluster *> &);
+double silhouetteWidth(Instance &, const std::vector<Cluster *> &);
 double categoricalUtility(const Instance &, const std::vector<Cluster *> &);
 double entropy(const Instance &, const std::vector<Cluster *> &);
+double kModesObjective(const Instance &, const std::vector<Cluster *> &);
 
 #endif /* Metrics_hpp */

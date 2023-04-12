@@ -129,7 +129,8 @@ int main(int argc, char ** argv) {
     int problemType = atoi(argv[2]);
     // Resolver o problema
     auto start = std::chrono::steady_clock::now();
-    double obj;
+    double obj = 0;
+    std::cout << "Instance: " << fileName << "\n";
     switch (problemType) {
         case 0: { // Cobertura
             // Resolver a instância pelo algoritmo da árvore
@@ -142,18 +143,24 @@ int main(int argc, char ** argv) {
             std::vector<Cluster *> partition = solver.getSolution();
             obj = solver.getObj();
             printPartition(argc >= 4 ? output : std::cout, partition);
-            std::cout << "Silhouette: " << averageSilhouetteIntersectionIndex(instance, partition) << "\n";
+            std::cout << "Silhouette Intersection: " << averageSilhouetteIntersectionIndex(instance, partition) << "\n";
+            std::cout << "Silhouette Width: " << silhouetteWidth(instance, partition) << "\n";
             std::cout << "Categorical Utility: " << categoricalUtility(instance, partition) << "\n";
             std::cout << "Entropy: " << entropy(instance, partition) << "\n";
+            std::cout << "Number of clusters: " << partition.size() << "\n";
+            std::cout << "K-modes Objective: " << kModesObjective(instance, partition) << "\n";
             break;
         } case 11: { // Partição com restrições de mesma interseção
             PairSolution solver(instance, true);
             std::vector<Cluster *> partition = solver.getSolution();
             obj = solver.getObj();
-            printPartition(argc >= 4 ? output : std::cout, partition);
-            std::cout << "Silhouette: " << averageSilhouetteIntersectionIndex(instance, partition) << "\n";
+//            printPartition(argc >= 4 ? output : std::cout, partition);
+            std::cout << "Silhouette Intersection: " << averageSilhouetteIntersectionIndex(instance, partition) << "\n";
+            std::cout << "Silhouette Width: " << silhouetteWidth(instance, partition) << "\n";
             std::cout << "Categorical Utility: " << categoricalUtility(instance, partition) << "\n";
             std::cout << "Entropy: " << entropy(instance, partition) << "\n";
+            std::cout << "Number of clusters: " << partition.size() << "\n";
+            std::cout << "K-modes Objective: " << kModesObjective(instance, partition) << "\n";
             break;
         } case 2: { // Partição por licitação
             obj = 0;
@@ -199,8 +206,8 @@ int main(int argc, char ** argv) {
     }
     auto end = std::chrono::steady_clock::now();
 
-    std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
     std::cout << "Objective: " << obj << "\n";
+    std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
     // Fechar o arquivo de entrada, caso aplicável
     if(argc >= 4) {
         output.close();
