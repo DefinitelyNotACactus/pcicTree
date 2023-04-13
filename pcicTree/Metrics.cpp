@@ -38,10 +38,11 @@ double distanceFunctionJaccard(Instance & instance, const int i, const int j) {
 }
 
 double silhouetteWidth(Instance & instance, const std::vector<Cluster *> &partition) {
+    if(partition.size() == 1) return 0;
     double *a = new double[instance.N], *cl = new double[instance.N], s = 0, constA;
     // Compute a
     for(int c = 0; c < partition.size(); c++) {
-        constA = 1.0 / (partition[c]->elements.size() - 1.0);
+        constA = (partition[c]->elements.size() > 1) ? 1.0 / (partition[c]->elements.size() - 1.0) : 0;
         for(int i = 0; i < partition[c]->elements.size(); i++) {
             a[partition[c]->elements[i]] = 0;
             for(int j = 0; j < partition[c]->elements.size(); j++) {
@@ -78,6 +79,7 @@ double silhouetteWidth(Instance & instance, const std::vector<Cluster *> &partit
 }
 
 double averageSilhouetteIntersectionIndex(const Instance & instance, const std::vector<Cluster *> &partition) {
+    if(partition.size() == 1) return 0;
     double *a = new double[instance.N], *cl = new double[instance.N], s = 0;
     // Compute a
     for(int c = 0; c < partition.size(); c++) {
