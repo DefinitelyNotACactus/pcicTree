@@ -16,7 +16,7 @@
 #include "Instance.hpp"
 #include "Util.hpp"
 
-#define MAX_TICKS 500000
+#define TIME_LIMIT 10000
 
 struct Candidate {
     int intersectionSize;
@@ -37,7 +37,8 @@ private:
     std::unordered_map<std::string, bool> intersections;
     std::vector<Candidate> candidates;
     std::stack<Candidate *> bestSolution;
-    int bestObj, nClusters, ticks;
+    std::chrono::steady_clock::time_point start;
+    int bestObj, nClusters;
     int **theoreticalObj;
     const bool restrictIntersection;
     

@@ -75,13 +75,13 @@ void PairSolution::computeTheoreticalObj() {
 
 // Buscar pela solução
 void PairSolution::solveRoot() {
+    start = std::chrono::steady_clock::now();
     for(int i = 0;  i < candidates.size(); i++) {
         std::stack<Candidate *> currentSolution;
         std::vector<bool> inPartition(instance.N, false);
         std::cout << "(" << i << "/" << candidates.size() << ") Best solution: " << bestObj << " Theoretical best: " << theoreticalObj[0][i] << "\n";
         std::vector<std::string> intersections;
         if(theoreticalObj[0][i] > bestObj) {
-            ticks = 0;
 //        if(candidates[i].intersectionSize * nClusters > bestObj) {
             currentSolution.push(&candidates[i]);
             inPartition[candidates[i].i] = true;
@@ -95,8 +95,8 @@ void PairSolution::solveRoot() {
             int status = solveNode(inPartition, currentSolution, i, candidates[i].intersectionSize, 1);
             switch (status) {
                 case -1:
-                    std::cout << "Maximum operations without improvement reached\n";
-                    break;
+                    std::cout << "Time limit exceeded\n";
+                    return;
                 case 0:
                     std::cout << "No improvement possible\n";
                     break;
@@ -111,8 +111,8 @@ void PairSolution::solveRoot() {
 }
 
 int PairSolution::solveNode(std::vector<bool> &inPartition, std::stack<Candidate *> &currentSolution, const int currentIndex, const int currentObj, int depth) {
-    if(ticks > MAX_TICKS) {
-        std::cout << "Maximum operations without improvement reached\n";
+    if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count() > TIME_LIMIT) {
+//        std::cout << "Maximum operations without improvement reached\n";
         return -1;
     }
     for(int i = currentIndex + 1; i < candidates.size(); i++) {
@@ -128,11 +128,9 @@ int PairSolution::solveNode(std::vector<bool> &inPartition, std::stack<Candidate
             inPartition[candidates[i].j] = true;
             intersections[candidates[i].intersectionStr] = true;
             if(currentSolution.size() < nClusters) {
-                ticks++;
                 solveNode(inPartition, currentSolution, i, currentObj + candidates[i].intersectionSize, depth++);
             }
             if(currentObj + candidates[i].intersectionSize > bestObj) {
-                ticks = 0;
                 bestSolution = currentSolution;
                 bestObj = currentObj + candidates[i].intersectionSize;
                 std::cout << "New best solution: " << bestObj << "\n";
