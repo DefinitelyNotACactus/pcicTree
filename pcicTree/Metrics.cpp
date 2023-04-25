@@ -192,3 +192,11 @@ double kModesObjective(const Instance & instance, const std::vector<Cluster *> &
     }
     return obj;
 }
+
+double icpObjective(const Instance & instance, const std::vector<Cluster *> &partition) {
+    double obj = 0;
+    for(Cluster * cluster : partition) {
+        obj += cluster->intersection.size();
+    }
+    return obj;
+}
