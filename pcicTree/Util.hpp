@@ -37,4 +37,6 @@ inline std::string intersectionString(const std::set<int> &intersection) {
     return str;
 }
 
+std::vector<Cluster *> readPartition(Instance &, char *);
+
 #endif /* Util_hpp */

@@ -4,6 +4,8 @@
 //
 //  Created by David Galvao on 02/02/23.
 //
+#include <fstream>
+#include <iostream>
 
 #include "Util.hpp"
 
@@ -53,4 +55,42 @@ std::set<int> getIntersection(Instance &g, const std::vector<int> &cluster, cons
         }
     }
     return newIntersection;
+}
+
+/* Faz a leitura de uma partição */
+std::vector<Cluster *> readPartition(Instance &g, char *filename) {
+    std::ifstream input(filename, std::ios::in);
+    if(!input) {
+        std::cout << "Error while opening file: " << filename << "\n";
+        exit(-1);
+    }
+    std::vector<Cluster *> partition;
+    int K;
+    // Ler o tamanho da partição
+    input >> K;
+    // Processar os clusters
+    int clusterId, clusterSize;
+    for(int i = 0; i < K; i++) {
+        input >> clusterId;
+        input >> clusterSize;
+        Cluster *c = new Cluster();
+        int x;
+        for(int j = 0; j < clusterSize; j++) {
+            input >> x;
+            if(c->elements.size() == 1) {
+                c->intersection = getIntersection(g, c->elements[0], x);
+            } else if(c->elements.size() > 1) {
+                c->intersection = getIntersection(g, c->elements, c->intersection, x);
+            }
+            c->elements.push_back(x);
+        }
+        if(c->elements.size() > 0) {
+            partition.push_back(c);
+        } else {
+            delete c;
+        }
+    }
+    input.close();
+    
+    return partition;
 }

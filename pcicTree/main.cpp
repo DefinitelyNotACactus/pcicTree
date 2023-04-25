@@ -17,27 +17,29 @@
 #include "Output.hpp"
 
 int main(int argc, char ** argv) {
-    if(argc < 3) {
-        std::cout << "Use ./<executable name> <input file name> <problem type, 0 for cover & 1 for partition & 2 for tender partition> <output file name (optional)>\n";
+    if(argc < 3 || argc > 5) {
+        std::cout << "Use ./<executable name> <input file name> <problem type> <input partition if problem type == 3> <output file name (optional)>\n";
+        std::cout << "Supported problems:\n0-Cover\n1-Partition\n2-Tender Partition\n3-Presolved Partition\n";
         return -1;
     }
     // Leitura da instância
     char *fileName = argv[1];
     Instance instance(fileName, std::regex_search(fileName, std::regex("N_\\d+_L_\\d+_d_\\d+\\.\\d+\\.txt")));
+    // Tipo de problema
+    int problemType = atoi(argv[2]);
     // Definição da saída
     std::ofstream output;
-    if(argc >= 4) {
-        output.open(argv[3], std::ios_base::app);
+    if((argc == 4 && problemType != 3) || (argc == 5 && problemType == 3)) {
+        int argvOutput = (problemType == 3)? 4 : 3;
+        output.open(argv[argvOutput], std::ios_base::app);
         if(!output) {
-            std::cout << "Error while handling output file: " << argv[3] << "\n";
+            std::cout << "Error while handling output file: " << argv[argvOutput] << "\n";
             exit(-1);
         }
         output << "Instance: " << fileName << "\n";
     } else {
         std::cout << "Instance: " << fileName << "\n";
     }
-    // Tipo de problema
-    int problemType = atoi(argv[2]);
     // Resolver o problema
     auto start = std::chrono::steady_clock::now();
     double obj = 0;
@@ -95,6 +97,11 @@ int main(int argc, char ** argv) {
                 obj += solver.getObj();
             }
             printPartitions(argc >= 4 ? output : std::cout, partitions);
+            break;
+        } case 3: { // Partição pré-resolvida
+            std::vector<Cluster *> partition = readPartition(instance, argv[3]);
+            printMetrics(argc >= 5 ? output : std::cout, instance, partition);
+            obj = icpObjective(instance, partition);
             break;
         } default: {
             std::cout << "Use 0 for cover & 1 for partition & 2 for tender partition\n";
