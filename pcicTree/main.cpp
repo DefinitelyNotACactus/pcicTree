@@ -18,8 +18,8 @@
 
 int main(int argc, char ** argv) {
     if(argc < 3 || argc > 5) {
-        std::cout << "Use ./<executable name> <input file name> <problem type> <input partition if problem type == 3> <output file name (optional)>\n";
-        std::cout << "Supported problems:\n0-Cover\n1-Partition\n2-Tender Partition\n3-Presolved Partition\n";
+        std::cout << "Use ./<executable name> <input file name> <problem type> <input partition if problem type == 3 or 4> <output file name (optional)>\n";
+        std::cout << "Supported problems:\n0-Cover\n1-Partition\n2-Tender Partition\n3-Presolved Partition\n4-Convert Output\n";
         return -1;
     }
     // Leitura da instância
@@ -27,16 +27,19 @@ int main(int argc, char ** argv) {
     Instance instance(fileName, std::regex_search(fileName, std::regex("N_\\d+_L_\\d+_d_\\d+\\.\\d+\\.txt")));
     // Tipo de problema
     int problemType = atoi(argv[2]);
+    bool solveProblem = (problemType != 3 && problemType != 4);
     // Definição da saída
     std::ofstream output;
-    if((argc == 4 && problemType != 3) || (argc == 5 && problemType == 3)) {
-        int argvOutput = (problemType == 3)? 4 : 3;
+    if((argc == 4 && solveProblem) || (argc == 5 && !solveProblem)) {
+        int argvOutput = (problemType == 3 || problemType == 4)? 4 : 3;
         output.open(argv[argvOutput], std::ios_base::app);
         if(!output) {
             std::cout << "Error while handling output file: " << argv[argvOutput] << "\n";
             exit(-1);
         }
-        output << "Instance: " << fileName << "\n";
+        if(problemType != 4) {
+            output << "Instance: " << fileName << "\n";
+        }
     } else {
         std::cout << "Instance: " << fileName << "\n";
     }
@@ -103,6 +106,11 @@ int main(int argc, char ** argv) {
             printMetrics(argc >= 5 ? output : std::cout, instance, partition);
             obj = icpObjective(instance, partition);
             break;
+        } case 4: { // Converter saída
+            std::vector<Cluster *> partition = readPartition(instance, argv[3]);
+            printPartition(argc >= 5 ? output : std::cout, partition);
+            obj = icpObjective(instance, partition);
+            break;
         } default: {
             std::cout << "Use 0 for cover & 1 for partition & 2 for tender partition\n";
             if(argc >= 4) {
@@ -112,7 +120,7 @@ int main(int argc, char ** argv) {
         }
     }
     auto end = std::chrono::steady_clock::now();
-    if(argc >= 4) {
+    if(argc >= 4 && problemType != 4) {
         output << "Objective: " << obj << "\n";
         output << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
     }
