@@ -19,7 +19,7 @@
 int main(int argc, char ** argv) {
     if(argc < 3 || argc > 5) {
         std::cout << "Use ./<executable name> <input file name> <problem type> <input partition if problem type == 3 or 4> <output file name (optional)>\n";
-        std::cout << "Supported problems:\n0-Cover\n1-Partition\n2-Tender Partition\n3-Presolved Partition\n4-Convert Output\n";
+        std::cout << "Supported problems:\n0-Cover\n1-Partition\n2-Tender Partition\n3-Presolved Partition\n4-Convert Output\n5-Print Matrix\n";
         return -1;
     }
     // Leitura da instância
@@ -111,6 +111,9 @@ int main(int argc, char ** argv) {
             printPartition(argc >= 5 ? output : std::cout, partition);
             obj = icpObjective(instance, partition);
             break;
+        } case 5: { // Matrix
+            printMatrix(argc >= 4 ? output : std::cout, instance);
+            break;
         } default: {
             std::cout << "Use 0 for cover & 1 for partition & 2 for tender partition\n";
             if(argc >= 4) {
@@ -124,8 +127,10 @@ int main(int argc, char ** argv) {
         output << "Objective: " << obj << "\n";
         output << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
     }
-    std::cout << "Objective: " << obj << "\n";
-    std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
+    if (problemType != 5) {
+        std::cout << "Objective: " << obj << "\n";
+        std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
+    }
     // Fechar o arquivo de entrada, caso aplicável
     if(argc >= 4) {
         output.close();

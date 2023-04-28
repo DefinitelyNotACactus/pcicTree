@@ -54,7 +54,7 @@ double printClusters(std::ostream &os, std::vector<TreeNode *> &clusters) {
 }
 
 void printPartition(std::ostream &os, std::vector<Cluster *> &clusters, bool ignoreEmptyIntersection) {
-    int i = 0, aux = 0, nClusters = (int) clusters.size();
+    int i = 0, aux = 0;
     os << "{\n\t\"Clusters\": [\n";
     for(Cluster * cluster : clusters) {
         if(ignoreEmptyIntersection && cluster->intersection.empty()) continue;
@@ -82,7 +82,7 @@ void printPartition(std::ostream &os, std::vector<Cluster *> &clusters, bool ign
                 aux++;
             }
         }
-        if(i < nClusters) {
+        if(i < clusters.size()) {
             os << ",\n";
         }
 //        delete cluster;
@@ -108,4 +108,14 @@ void printMetrics(std::ostream &os, Instance &instance, std::vector<Cluster *> &
     os << "Entropy: " << entropy(instance, partition) << "\n";
     os << "Number of clusters: " << partition.size() << "\n";
     os << "K-modes Objective: " << kModesObjective(instance, partition) << "\n";
+}
+
+void printMatrix(std::ostream &os, Instance &instance) {
+    os << instance.N << " " << instance.L << "\n";
+    for(int i = 0; i < instance.N; i++) {
+        for(int j = 0; j < instance.L - 1; j++) {
+            os << instance.matrix[i][j] << " ";
+        }
+        os << instance.matrix[i][instance.L - 1] << "\n";
+    }
 }
