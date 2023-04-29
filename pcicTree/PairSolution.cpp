@@ -9,7 +9,7 @@
 
 #include "PairSolution.hpp"
 
-PairSolution::PairSolution(Instance &instance, bool restrictIntersection) : restrictIntersection(restrictIntersection), nClusters(ceil((double) instance.N / 2)), instance(instance), bestObj(0), theoreticalObj(new int*[nClusters]) {
+PairSolution::PairSolution(Instance &instance, bool restrictIntersection) : restrictIntersection(restrictIntersection), nClusters(ceil((double) instance.numVerticesUsed / 2)), instance(instance), bestObj(0), theoreticalObj(new int*[nClusters]) {
     createCandidates();
     computeTheoreticalObj();
     solveRoot();
@@ -27,7 +27,7 @@ PairSolution::PairSolution(Instance &instance, std::set<int> participants, bool 
 void PairSolution::createCandidates(std::set<int> participants) {
     // Listar todos os cluster mínimos (candidatos)
     for(int i = 0; i < instance.N; i++) {
-        if(!participants.empty() && participants.find(i) == participants.end()) continue;
+        if((!participants.empty() && participants.find(i) == participants.end()) || !instance.vertexUsed[i]) continue;
         for(int j = i + 1; j < instance.N; j++) {
             if(!participants.empty() && participants.find(j) == participants.end()) continue;
             std::set<int> intersection = getIntersection(instance, i, j);
@@ -188,35 +188,4 @@ std::vector<Cluster *> PairSolution::getSolution() {
     }
     
     return solution;
-}
-
-std::vector<Cluster *> pairSolve(Instance &instance) {
-    std::vector<Cluster *> clusters;
-    std::vector<Candidate> candidates;
-    // Listar todos os cluster mínimos (candidatos)
-    for(int i = 0; i < instance.N; i++) {
-        for(int j = i + 1; j < instance.N; j++) {
-            std::set<int> intersection = getIntersection(instance, i, j);
-            if(intersection.size() > 0) {
-                candidates.push_back(Candidate(i, j, (int) intersection.size(), intersectionString(intersection)));
-            }
-        }
-    }
-    std::sort(candidates.begin(), candidates.end(), std::greater<Candidate>());
-    // Construir as solução inicial, pegar o cluster com maior interseção
-    // seguido pelo segundo maior (cujos membros não apareceram na partição) e assim sucessivamente
-    std::vector<bool> inPartition;
-    int bestSolutionValue = INFINITY;
-    std::vector<Candidate *> bestSolution;
-    for(int i = 0; i < instance.N; i++) {
-        std::vector<Candidate *> solution;
-        if(candidates[i].intersectionSize * round((double) instance.N / 2) < bestSolutionValue) {
-            inPartition = std::vector<bool>(instance.N, false);
-            inPartition[candidates[i].i] = true;
-            inPartition[candidates[i].j] = true;
-            
-            solution.push_back(&candidates[i]);
-        }
-    }
-    return clusters;
 }

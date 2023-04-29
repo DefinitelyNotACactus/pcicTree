@@ -16,7 +16,7 @@
 #include "Instance.hpp"
 #include "Util.hpp"
 
-#define TIME_LIMIT 10000
+#define TIME_LIMIT 60000
 
 struct Candidate {
     int intersectionSize;
@@ -54,7 +54,4 @@ public:
     std::vector<Cluster *> getSolution();
     inline int getObj() { return bestObj; }
 };
-
-std::vector<Cluster *> pairSolve(Instance &);
-
 #endif /* PairSolution_hpp */
