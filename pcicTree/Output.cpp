@@ -84,14 +84,14 @@ void printPartition(std::ostream &os, Instance &instance, std::vector<Cluster *>
                 aux++;
             }
         }
-        os << "\"P_cond\": " << (cluster->intersection.size() + K) / (instance.numResourcesUsed + 2 * K) << ", \n\t\t}";
+        os << "\"P_cond\": " << (cluster->intersection.size() + K) / (instance.numResourcesUsed + 2 * K) << "\n\t\t}";
         if(i < clusters.size()) {
             os << ",\n";
         }
 //        delete cluster;
     }
     os << "],\n";
-    os << "\t\"N_clusters\": " << clusters.size() << ", \n}\n";
+    os << "\t\"N_clusters\": " << clusters.size() << "\n}\n";
 }
 
 void printPartitions(std::ostream &os, Instance &instance, std::vector<std::vector<Cluster *>> &partitions) {
