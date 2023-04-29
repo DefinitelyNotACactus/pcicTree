@@ -19,8 +19,8 @@
 
 void printCluster(std::ostream &, TreeNode *, int, int &, int &);
 double printClusters(std::ostream &, std::vector<TreeNode *> &);
-void printPartition(std::ostream &, std::vector<Cluster *> &, bool=false);
-void printPartitions(std::ostream &, std::vector<std::vector<Cluster *>> &);
+void printPartition(std::ostream &, Instance &, std::vector<Cluster *> &, bool=false);
+void printPartitions(std::ostream &, Instance &, std::vector<std::vector<Cluster *>> &);
 void printMetrics(std::ostream &, Instance &, std::vector<Cluster *> &);
 void printMatrix(std::ostream &, Instance &);
 

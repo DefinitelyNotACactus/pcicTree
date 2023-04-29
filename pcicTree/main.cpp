@@ -53,21 +53,16 @@ int main(int argc, char ** argv) {
             // Imprimir o resultado
             obj = printClusters(argc >= 4 ? output : std::cout, cover);
             break;
-        } case 1: { // Partição
-            PairSolution solver(instance, false);
+        } case 1:
+          case 11: { // Partição
+            PairSolution solver(instance, problemType == 11);
             std::vector<Cluster *> partition = solver.getSolution();
             obj = solver.getObj();
-//            printPartition(argc >= 4 ? output : std::cout, partition);
+            printPartition(argc >= 4 ? output : std::cout, instance, partition);
             printMetrics(argc >= 4 ? output : std::cout, instance, partition);
             break;
-        } case 11: { // Partição com restrições de mesma interseção
-            PairSolution solver(instance, true);
-            std::vector<Cluster *> partition = solver.getSolution();
-            obj = solver.getObj();
-//            printPartition(argc >= 4 ? output : std::cout, partition);
-            printMetrics(argc >= 4 ? output : std::cout, instance, partition);
-            break;
-        } case 2: { // Partição por licitação
+        } case 2:
+          case 21: { // Partição por licitação
             obj = 0;
             std::vector<std::vector<Cluster *>> partitions;
             for(int l = 0; l < instance.L; l++) {
@@ -78,28 +73,11 @@ int main(int argc, char ** argv) {
                         participants.insert(i);
                     }
                 }
-                PairSolution solver(instance, participants, false);
+                PairSolution solver(instance, participants, problemType == 21);
                 partitions.push_back(solver.getSolution());
                 obj += solver.getObj();
             }
-            printPartitions(argc >= 4 ? output : std::cout, partitions);
-            break;
-        } case 21: { // Partição por licitação com restrições de mesma interseção
-            obj = 0;
-            std::vector<std::vector<Cluster *>> partitions;
-            for(int l = 0; l < instance.L; l++) {
-                std::cout << "Tender " << l << "/" << instance.L << "\n";
-                std::set<int> participants;
-                for(int i = 0; i < instance.N; i++) {
-                    if(instance.matrix[i][l]) {
-                        participants.insert(i);
-                    }
-                }
-                PairSolution solver(instance, participants, true);
-                partitions.push_back(solver.getSolution());
-                obj += solver.getObj();
-            }
-            printPartitions(argc >= 4 ? output : std::cout, partitions);
+            printPartitions(argc >= 4 ? output : std::cout, instance, partitions);
             break;
         } case 3: { // Partição pré-resolvida
             std::vector<Cluster *> partition = readPartition(instance, argv[3]);
@@ -108,7 +86,7 @@ int main(int argc, char ** argv) {
             break;
         } case 4: { // Converter saída
             std::vector<Cluster *> partition = readPartition(instance, argv[3]);
-            printPartition(argc >= 5 ? output : std::cout, partition);
+            printPartition(argc >= 5 ? output : std::cout, instance, partition);
             obj = icpObjective(instance, partition);
             break;
         } case 5: { // Matrix

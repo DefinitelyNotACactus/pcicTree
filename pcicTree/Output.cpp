@@ -53,7 +53,7 @@ double printClusters(std::ostream &os, std::vector<TreeNode *> &clusters) {
     return obj;
 }
 
-void printPartition(std::ostream &os, std::vector<Cluster *> &clusters, bool ignoreEmptyIntersection) {
+void printPartition(std::ostream &os, Instance &instance, std::vector<Cluster *> &clusters, bool ignoreEmptyIntersection) {
     int i = 0, aux = 0;
     os << "{\n\t\"Clusters\": [\n";
     for(Cluster * cluster : clusters) {
@@ -77,11 +77,12 @@ void printPartition(std::ostream &os, std::vector<Cluster *> &clusters, bool ign
                 if(aux < cluster->intersection.size() - 1) {
                     os << label << ", ";
                 } else {
-                    os << label << "] \n\t\t}";
+                    os << label << "], \n\t\t\t";
                 }
                 aux++;
             }
         }
+        os << "\"P_cond\": " << cluster->intersection.size() / (double) instance.numResourcesUsed << ", \n\t\t}";
         if(i < clusters.size()) {
             os << ",\n";
         }
@@ -90,10 +91,10 @@ void printPartition(std::ostream &os, std::vector<Cluster *> &clusters, bool ign
     os << "]\n}\n";
 }
 
-void printPartitions(std::ostream &os, std::vector<std::vector<Cluster *>> &partitions) {
+void printPartitions(std::ostream &os, Instance &instance, std::vector<std::vector<Cluster *>> &partitions) {
     os << "{\"Partitions\": [\n";
     for(int l = 0; l < partitions.size(); l++) {
-        printPartition(os, partitions[l], true);
+        printPartition(os, instance, partitions[l], true);
         if(l < partitions.size() - 1) {
             os << ",";
         }

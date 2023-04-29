@@ -14,8 +14,9 @@
 
 class Instance {
 public:
-    int N, L;
+    int N, L, numResourcesUsed;
     std::vector<std::set<int>> vertices;
+    std::vector<bool> resourceUsed;
     std::set<int> **verticesIntersections;
     bool **matrix;
     

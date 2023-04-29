@@ -9,11 +9,14 @@
 
 #include "Instance.hpp"
 
-Instance::Instance(char *filename, bool legacy) {
+Instance::Instance(char *filename, bool legacy) : numResourcesUsed(0) {
     if(legacy) {
         readInstanceLegacy(filename);
     } else {
         readInstance(filename);
+    }
+    for(int i = 0; i < L; i++) {
+        if(resourceUsed[i]) numResourcesUsed++;
     }
 }
 
@@ -40,6 +43,7 @@ void Instance::readInstance(char *filename) {
     matrix = new bool*[N];
     vertices = std::vector<std::set<int>>(N);
     verticesIntersections = new std::set<int>*[N];
+    resourceUsed = std::vector<bool>(L, false);
     // Processar os recursos das empresas
     int v, vnl, l;
     for(int i = 0; i < N; i++) {
@@ -53,6 +57,7 @@ void Instance::readInstance(char *filename) {
         for(int j = 0; j < vnl; j++) {
             input >> l;
             matrix[v][l] = true;
+            resourceUsed[l] = true;
             vertices[v].insert(l);
         }
     }
@@ -73,6 +78,7 @@ void Instance::readInstanceLegacy(char *filename) {
     matrix = new bool*[N];
     vertices = std::vector<std::set<int>>(N);
     verticesIntersections = new std::set<int>*[N];
+    resourceUsed = std::vector<bool>(L, false);
     // Processar os recursos das empresas
     int aux;
     for(int i = 0; i < N; i++) {
@@ -83,6 +89,7 @@ void Instance::readInstanceLegacy(char *filename) {
             matrix[i][j] = (aux == 1);
             if(matrix[i][j]) {
                 vertices[i].insert(j);
+                resourceUsed[j] = true;
             }
         }
     }
