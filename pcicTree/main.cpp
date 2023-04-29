@@ -37,7 +37,7 @@ int main(int argc, char ** argv) {
             std::cout << "Error while handling output file: " << argv[argvOutput] << "\n";
             exit(-1);
         }
-        if(problemType != 4) {
+        if(problemType == 3) {
             output << "Instance: " << fileName << "\n";
         }
     } else {
@@ -59,7 +59,7 @@ int main(int argc, char ** argv) {
             std::vector<Cluster *> partition = solver.getSolution();
             obj = solver.getObj();
             printPartition(argc >= 4 ? output : std::cout, instance, partition);
-            printMetrics(argc >= 4 ? output : std::cout, instance, partition);
+//            printMetrics(argc >= 4 ? output : std::cout, instance, partition);
             break;
         } case 2:
           case 21: { // Partição por licitação
@@ -101,9 +101,9 @@ int main(int argc, char ** argv) {
         }
     }
     auto end = std::chrono::steady_clock::now();
-    if(argc >= 4 && problemType != 4) {
+    if(argc >= 4 && problemType == 3) {
         output << "Objective: " << obj << "\n";
-        output << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
+//        output << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
     }
     if (problemType != 5) {
         std::cout << "Objective: " << obj << "\n";

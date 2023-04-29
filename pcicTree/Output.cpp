@@ -7,6 +7,8 @@
 
 #include "Output.hpp"
 
+#define K 0.001
+
 void printCluster(std::ostream &os, TreeNode * cluster, int nClusters, int &i, int &aux) {
     os << "\t\t{\n\t\t\t\"id\": " << i++ << ", \n\t\t\t\"Elements\": [";
     aux = 0;
@@ -71,7 +73,7 @@ void printPartition(std::ostream &os, Instance &instance, std::vector<Cluster *>
         os << "\t\t\t\"Intersection\": [";
         aux = 0;
         if(cluster->intersection.empty()) {
-            os << " ] \n\t\t\t";
+            os << " ], \n\t\t\t";
         } else {
             for(int label : cluster->intersection) {
                 if(aux < cluster->intersection.size() - 1) {
@@ -82,19 +84,20 @@ void printPartition(std::ostream &os, Instance &instance, std::vector<Cluster *>
                 aux++;
             }
         }
-        os << "\"P_cond\": " << cluster->intersection.size() / (double) instance.numResourcesUsed << ", \n\t\t}";
+        os << "\"P_cond\": " << (cluster->intersection.size() + K) / (instance.numResourcesUsed + 2 * K) << ", \n\t\t}";
         if(i < clusters.size()) {
             os << ",\n";
         }
 //        delete cluster;
     }
-    os << "]\n}\n";
+    os << "],\n";
+    os << "\t\"N_clusters\": " << clusters.size() << ", \n}\n";
 }
 
 void printPartitions(std::ostream &os, Instance &instance, std::vector<std::vector<Cluster *>> &partitions) {
     os << "{\"Partitions\": [\n";
     for(int l = 0; l < partitions.size(); l++) {
-        printPartition(os, instance, partitions[l], true);
+        printPartition(os, instance, partitions[l], false);
         if(l < partitions.size() - 1) {
             os << ",";
         }
